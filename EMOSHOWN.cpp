@@ -11,8 +11,7 @@ void Emotion(int i);
 void Mood(int i);
 void Log(int i);
 void Menu(int i);
-void sortingByDate();
-void sortingByMental();
+
 void clear();
 const int DAYS = 7;
 
@@ -35,16 +34,20 @@ struct Day
     double sum;
     double average;
 };
-struct UserLog{
+struct UserLog
+{
     int year;
     int month;
     int days;
     float ave;
     string des;
 };
+
 Day day[DAYS];
 UserLog logs[100];
-
+void sortingByDate(UserLog logsArray[100], int currentSize);
+void sortingByMental(UserLog logsArray[100], int currentSize);
+void sortingByAverage(UserLog logsArray[100], int currentSize);
 double Result_Mental_State(double sum, int i)
 {
     sum = (day[i].dailyStressLevel + day[i].dailyEmotionLevel + day[i].dailyMoodLevel);
@@ -113,6 +116,7 @@ void user(int i)
     userlog.days = day[i].days;
     userlog.year = day[i].year;
     userlog.month = day[i].month;
+    logs[i] = userlog;
 }
 void Stress(int i)
 {
@@ -237,8 +241,8 @@ void Emotion(int i)
     Log(i);
 }
 void Mood(int i)
-{   
-   
+{
+
     cout << "==============================================" << endl;
     cout << "\tEMOSHOWN: MENTAL HEALTH TRACKER\t" << endl;
     cout << "==============================================" << endl;
@@ -319,7 +323,7 @@ void Menu(int i)
 }
 int main()
 {
-   
+
     int i = 0;
     user(i);
     while (true)
@@ -330,7 +334,6 @@ int main()
         {
             break;
         }
-        i++;
         if (i >= DAYS)
         {
             cout << "You've reached the max number of days to log." << endl;
@@ -373,47 +376,63 @@ void Log(int i)
         {
             Menu(i);
             Log(i);
-        }else{
+        }
+        else
+        {
             cin.ignore();
             Log(i);
-            
         }
         break;
     case 2:
-        cout << "Choice: " << choice << endl;
         cout << "==============================================" << endl;
         cout << "\tEMOSHOWN: MENTAL HEALTH TRACKER\t" << endl;
         cout << "==============================================" << endl;
         cout << "<< Daily Mental Health summary" << endl;
-        cout << "Day: " << day[i].days << endl;
+        cout << "Day: " << i + 1 << endl;
         cout << "\t|| Stress level  : " << day[i].stress << endl;
         cout << "\t|| Emotion level :  " << day[i].emotion << endl;
         cout << "\t|| Mood level    : " << day[i].mood << endl;
         cout << endl;
         cout << "<< Assessment          : " << Result_Assessment(day[i].average) << endl;
         cout << "<< Your Note           : " << "\"" << day[i].Notes << "\"" << endl;
+
         cout << "<< Mental State Average: " << fixed << setprecision(1) << Result_Mental_State(day[i].sum, i) << " " << Description(day[i].average) << endl;
-        cout << "********************************************************************"<< endl;
+        logs[i].ave = Result_Mental_State(day[i].sum, i);
+        logs[i].des = Description(day[i].average);
+        cout << "********************************************************************" << endl;
         cout << "(1) Would you like to enter new log?" << endl;
         cout << "(2) Sorting by Mental State" << endl;
         cout << "(3) Sorting by Date" << endl;
+        cout << endl;
         cout << "\t\t(4) Back to menu" << endl;
         cout << ">> ";
         cin >> day[i].choice2;
-        if (day[i].choice2 == 1){
-
-         }
-        if (day[i].choice2 == 2){
-
-         }
-        if (day[i].choice2 == 3){
-
-         }
+        if (day[i].choice2 == 1)
+        {
+            i++;
+            cout << "Date [mm dd yyyy]: ";
+            UserLog newLog;
+            Day newDay;
+            day[i] = newDay;
+            logs[i] = newLog;
+            cin >> logs[i].month >> logs[i].days >> logs[i].year;
+            cin.ignore();
+            clear();
+            Menu(i);
+            Log(i);
+        }
+        if (day[i].choice2 == 2)
+        {
+            sortingByMental(logs, i);
+        }
+        if (day[i].choice2 == 3)
+        {
+        }
         if (day[i].choice2 == 4)
         {
             Menu(i);
             Log(i);
-        } 
+        }
         break;
 
     case 3:
@@ -444,11 +463,100 @@ void Log(int i)
 
     // deletion>>
 }
-void sortingByMental(){
+void sortingByMental(UserLog logsArray[100], int currentSize)
+{
 
+    clear();
+    cout << "Current size: " << currentSize << endl;
+    cout << "==============================================" << endl;
+    cout << "\tEMOSHOWN: MENTAL HEALTH TRACKER\t" << endl;
+    cout << "==============================================" << endl;
+    cout << "<< Sorting by Mental State" << endl;
+    for (int i = 1; i < currentSize + 1; i++)
+    {
+        UserLog key = logsArray[i];
+        int j = i - 1;
+
+        while (j >= 0 && logsArray[j].des > key.des)
+        {
+
+            logsArray[j + 1] = logsArray[j];
+            j--;
+        }
+        logsArray[j + 1] = key;
+    }
+    int c;
+    do
+    {
+        cout << setw(15) << left << "Date" << setw(25) << left << "Mental Health State" << setw(15) << left << "Description" << endl
+             << endl;
+        for (int i = 0; i < currentSize + 1; i++)
+        {
+            cout << setw(15) << left << (to_string(logsArray[i].month) + "/" + to_string(logsArray[i].days) + "/" + to_string(logsArray[i].year)) << setw(25) << left << logsArray[i].ave << setw(15) << left << logsArray[i].des << endl;
+        }
+
+        cout << "\t\t(1) Back to menu" << endl;
+        cout << ">> ";
+        cin >> c;
+    } while (c != 1);
+    clear();
+    Menu(currentSize);
+    Log(currentSize);
 }
+void sortingByDate(UserLog logsArray[100], int currentSize)
+{
 
+    for (int i = 1; i < currentSize; i++)
+    {
+        UserLog key = logsArray[i];
+        int j = i - 1;
+
+        while (j >= 0 && ((logsArray[j].year > key.year && logsArray[j].month == key.month && logsArray[j].days == key.days) ||
+                          (logsArray[j].year > key.year && logsArray[j].month == key.month && logsArray[j].days > key.days) ||
+                          (logsArray[j].year > key.year && logsArray[j].month > key.month && logsArray[j].days > key.days)))
+        {
+
+            logsArray[j + 1] = logsArray[j];
+            j--;
+        }
+        logsArray[j + 1] = key;
+    }
+
+    for (int i = 0; i < currentSize; i++)
+    {
+        cout << logsArray[i].des << endl;
+    }
+}
+void sortingByAverage(UserLog logsArray[100], int currentSize)
+{
+
+    clear();
+    cout << "Current size: " << currentSize << endl;
+    cout << "==============================================" << endl;
+    cout << "\tEMOSHOWN: MENTAL HEALTH TRACKER\t" << endl;
+    cout << "==============================================" << endl;
+    cout << "<< Sorting by Mental State" << endl;
+    for (int i = 1; i < currentSize; i++)
+    {
+        UserLog key = logsArray[i];
+        int j = i - 1;
+
+        while (j >= 0 && logsArray[j].ave > key.ave)
+        {
+
+            logsArray[j + 1] = logsArray[j];
+            j--;
+        }
+        logsArray[j + 1] = key;
+    }
+
+    for (int i = 0; i < currentSize; i++)
+    {
+        cout << logsArray[i].des << endl;
+    }
+}
 // tools
-void clear(){
+void clear()
+{
     system("cls");
 }
